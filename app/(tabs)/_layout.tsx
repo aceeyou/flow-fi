@@ -1,45 +1,95 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState, Suspense } from "react";
+import { Tabs } from "expo-router";
+import { colors } from "@/constants/theme";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+const _layout = () => {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarActiveTintColor: colors.tertiary,
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          backgroundColor: "#0a0a0a",
+          borderWidth: 0,
+          borderTopWidth: 0,
+          borderTopColor: "transparent",
+          height: 80,
+          paddingTop: 10,
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="home"
+              size={Platform.OS == "android" ? 30 : size}
+              color={color}
+            />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="accounts"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          headerTitle: "Accounts",
+          headerTitleStyle: {
+            color: colors.text,
+          },
+          headerStyle: {
+            backgroundColor: "#0a0a0a",
+          },
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="credit-card-multiple"
+              size={Platform.OS == "android" ? 30 : size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="transactions"
+        options={{
+          headerTitle: "Transactions",
+          headerTitleStyle: {
+            color: colors.text,
+          },
+          headerStyle: {
+            backgroundColor: "#0a0a0a",
+          },
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons
+              name="receipt"
+              size={Platform.OS == "android" ? 30 : size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons
+              name="settings"
+              size={Platform.OS == "android" ? 30 : size}
+              color={color}
+            />
+          ),
         }}
       />
     </Tabs>
   );
-}
+};
+
+export default _layout;
+
+const styles = StyleSheet.create({});
