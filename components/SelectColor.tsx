@@ -1,17 +1,10 @@
 import { Modal, Pressable, StyleSheet, View } from "react-native";
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useState } from "react";
 import ColorPicker, {
   HueSlider,
   Panel1,
   Preview,
   InputWidget,
-  ColorPickerRef,
 } from "reanimated-color-picker";
 import Typo from "@/components/Typo";
 import ScreenWrapper from "@/components/ScreenWrapper";
@@ -23,7 +16,7 @@ import CreateModalHeader from "./CreateModalHeader";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 const SelectColor = ({
-  newCategory,
+  newItem,
   onSelectColor,
   currentColor,
 }: SelectColorProps) => {
@@ -53,17 +46,17 @@ const SelectColor = ({
       <Pressable onPress={() => setModalVisible(true)}>
         <View
           style={{
-            width: 100,
+            width: 60,
             aspectRatio: 1,
-            backgroundColor: newCategory?.color,
+            backgroundColor: newItem?.color,
             borderRadius: "100%",
             borderCurve: "circular",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <FontAwesome6 name="droplet" size={30} color="white" />
-          <View style={[styles.editSelectedEmoji, { width: 30, right: 5 }]}>
+          <FontAwesome6 name="droplet" size={23} color="white" />
+          <View style={[styles.editSelectedEmoji, { width: 25, right: 2 }]}>
             <Entypo name="pencil" size={20} color="black" />
           </View>
         </View>
@@ -134,6 +127,8 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     borderRadius: "100%",
     borderCurve: "continuous",
+    borderColor: "#0b0b0b",
+    borderWidth: 1,
   },
   btn: {
     width: "70%",

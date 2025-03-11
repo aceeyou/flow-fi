@@ -20,7 +20,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#09c2a0"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.aceeyou.flowfi"
     },
     "web": {
       "bundler": "metro",
@@ -38,9 +43,31 @@
           "backgroundColor": "#09c2a0"
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow flow-fi to access your photos for you to set an icon or an image to the categories and account that you create inside the app"
+        }
+      ],
       "expo-font",
-      "expo-sqlite",
-      "expo-asset"
+      [
+        "expo-sqlite",
+        {
+          "enableFTS": true,
+          "useSQLCipher": true,
+          "android": {
+            "enableFTS": false,
+            "useSQLCipher": false
+          },
+          "ios": {
+            "customBuildFlags": [
+              "-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"
+            ]
+          }
+        }
+      ],
+      "expo-asset",
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true

@@ -10,7 +10,7 @@ import {
 import React, { useState } from "react";
 import Typo from "./Typo";
 import Entypo from "@expo/vector-icons/Entypo";
-import EmojiPicker, { EmojiType } from "rn-emoji-keyboard";
+import EmojiPicker from "rn-emoji-keyboard";
 import { CategoryFormProps } from "@/types";
 import Dropdown from "./Dropdown/Dropdown";
 import SelectColor from "@/components/SelectColor";
@@ -30,7 +30,6 @@ const CategoryFormContent = ({
       <SafeAreaView>
         <View>
           {/* emoji */}
-
           <View
             style={{
               flexDirection: "row",
@@ -47,7 +46,9 @@ const CategoryFormContent = ({
               ]}
             >
               <View style={styles.selectedEmojiContainer}>
-                <Typo size={50}>{newCategory?.icon}</Typo>
+                <Typo size={70} style={{ marginLeft: -0.4 }}>
+                  {newCategory?.icon}
+                </Typo>
               </View>
               <View style={styles.editSelectedEmoji}>
                 <Entypo name="pencil" size={24} color="black" />
@@ -63,14 +64,6 @@ const CategoryFormContent = ({
               onEmojiSelected={handleEmojiPick}
               onClose={() => setIsOpen(false)}
             />
-
-            <View>
-              <SelectColor
-                newCategory={newCategory}
-                onSelectColor={onSelectColor}
-                currentColor={newCategory.color}
-              />
-            </View>
           </View>
 
           {/* More info */}
@@ -79,9 +72,9 @@ const CategoryFormContent = ({
               <Typo style={{ opacity: 0.5, marginRight: 8 }}>Name</Typo>
               <TextInput
                 onChangeText={(e: string) =>
-                  setNewCategory((prev) => ({ ...prev, name: e }))
+                  setNewCategory((prev) => ({ ...prev, category_name: e }))
                 }
-                value={newCategory.name}
+                value={newCategory.category_name}
                 style={{
                   flex: 1,
                   color: "white",
@@ -129,25 +122,25 @@ const CategoryFormContent = ({
                     marginRight: 15,
                   }}
                 >
-                  <Typo size={18}>{newCategory.icon}</Typo>
+                  <Typo size={24}>{newCategory.icon}</Typo>
                 </View>
                 <Typo fontWeight={"700"}>
-                  {newCategory.name || "Category Name"}
+                  {newCategory.category_name || "Category Name"}
                 </Typo>
               </View>
             </View>
 
             {/* Color Selector */}
-            {/* <View>
-          <Typo size={14} style={{ marginVertical: 8, opacity: 0.5 }}>
-          Color
-          </Typo>
-          <SelectColor
-          newCategory={newCategory}
-          onSelectColor={onSelectColor}
-          currentColor={newCategory.color}
-          />
-          </View> */}
+            <View>
+              <Typo size={14} style={{ marginVertical: 8, opacity: 0.5 }}>
+                Color
+              </Typo>
+              <SelectColor
+                newItem={newCategory}
+                onSelectColor={onSelectColor}
+                currentColor={newCategory.color}
+              />
+            </View>
           </View>
         </View>
       </SafeAreaView>
@@ -163,14 +156,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "brown",
-    width: 100,
-    // marginHorizontal: "auto",
+    width: 101,
+    marginHorizontal: "auto",
     marginVertical: 30,
     aspectRatio: 1,
     borderRadius: "100%",
     borderCurve: "continuous",
   },
-  selectedEmojiContainer: {},
+  selectedEmojiContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
   editSelectedEmoji: {
     position: "absolute",
     bottom: -5,

@@ -1,9 +1,17 @@
-import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Dimensions,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 import Typo from "./Typo";
 import { LineChart } from "react-native-gifted-charts";
 import { QuickBtnProps } from "@/types";
 import { colors, radius } from "@/constants/theme";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { router } from "expo-router";
 
 // Fetch values from transactions table
 const categorieTrxValues = [
@@ -15,33 +23,61 @@ const categorieTrxValues = [
   { value: 400 },
 ];
 
-const QuickBtn = ({ quickT }: QuickBtnProps) => {
+const QuickBtn = ({ quickT, fullWidth = false }: QuickBtnProps) => {
   return (
     <TouchableOpacity
-      style={[styles.container, { backgroundColor: quickT.color }]}
+      style={[
+        styles.container,
+        {
+          backgroundColor: quickT.color,
+          width: fullWidth ? "100%" : (Dimensions.get("screen").width - 46) / 2,
+        },
+      ]}
+      activeOpacity={0.5}
     >
       <View style={[styles.iconContainer]}>
         <Typo size={20}>{quickT.icon}</Typo>
       </View>
       <View>
         <Typo size={14} fontWeight="600">
-          {quickT.name}
+          {quickT.category_name}
         </Typo>
         <Typo size={10} fontWeight={"400"}>
           P 365.00
         </Typo>
       </View>
       <View style={{ position: "absolute", right: 15, top: 20 }}>
-        <LineChart
-          data={categorieTrxValues}
-          curved
-          color={"#ffffff8f"}
-          hideAxesAndRules
-          hideDataPoints
-          spacing={4}
-          width={60}
-          height={20}
-        />
+        {fullWidth ? (
+          <View>
+            <TouchableOpacity
+              style={styles.editBtn}
+              hitSlop={50}
+              onPress={() =>
+                router.push({
+                  pathname: "/editcategory",
+                  params: { id: quickT.id },
+                })
+              }
+            >
+              <MaterialCommunityIcons
+                name="dots-horizontal-circle-outline"
+                size={24}
+                color={colors.neutral100}
+              />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <LineChart
+            data={categorieTrxValues}
+            curved
+            color={"#ffffff8f"}
+            hideAxesAndRules
+            hideDataPoints
+            spacing={4}
+            width={60}
+            height={20}
+          />
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -69,5 +105,10 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  editBtn: {
+    borderRadius: 100,
+    padding: 1,
+    // backgroundColor: colors.icon_bg,
   },
 });

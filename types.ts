@@ -1,18 +1,26 @@
-import React, { Ref, SetStateAction } from "react";
-import {
-  GestureResponderEvent,
-  TextProps,
-  TextStyle,
-  ViewStyle,
-} from "react-native";
+import React, { ReactNode, SetStateAction } from "react";
+import { TextProps, TextStyle, ViewStyle } from "react-native";
 import { EmojiType } from "rn-emoji-keyboard";
+import { categories } from "./db/schema";
+import { ParamListBase } from "@react-navigation/native";
 
 export type CategoriesProps = {
   id?: number;
-  name: string;
+  category_name: string;
   icon: string;
   color: string;
   type: string;
+};
+
+export type AccountProps = {
+  id?: number;
+  account_name: string;
+  balance: number;
+  isImage: number;
+  icon: string;
+  color: string;
+  imageUri: string;
+  savedUri: string;
 };
 
 export type ScreenWrapperProps = {
@@ -34,7 +42,7 @@ export type TypoProps = {
 };
 
 export type HeadsUpProps = {
-  balance: string;
+  balance: number;
 };
 
 export type ListItemProps = {
@@ -50,6 +58,7 @@ export type QuickTransactionListProps = {
 
 export type QuickBtnProps = {
   quickT: CategoriesProps;
+  fullWidth?: boolean;
 };
 
 export type BottomSheetHeaderProps = {
@@ -66,17 +75,43 @@ export type CategoryFormProps = {
   onSelectColor: ({ hex }: { hex: string }) => void;
 };
 
+export type AccountFormProps = {
+  newAccount: AccountProps;
+  setNewAccount: (prev: SetStateAction<AccountProps>) => void;
+  handleEmojiPick: (emojiType: EmojiType) => void;
+  typePickerOpen?: () => void;
+  onSelectColor: ({ hex }: { hex: string }) => void;
+};
+
 export type DropdownProps = {
   categoryType: string;
   setNewCategory: (prev: SetStateAction<CategoriesProps>) => void;
 };
 
 export type SelectColorProps = {
-  newCategory: CategoriesProps;
+  newItem: CategoriesProps | AccountProps;
   onSelectColor: ({ hex }: { hex: string }) => void;
   currentColor: string;
 };
 
-export type CreateCategoryFormProps = {
+export type CreateFormProps = {
   setShowForm: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export interface NavigateButtonProps<
+  ParamList extends ParamListBase,
+  RouteName extends keyof ParamList
+> {
+  to: RouteName;
+  params?: ParamList[RouteName];
+  itemTitle: string;
+  children: ReactNode;
+}
+
+export type DialogProps = {
+  title: string;
+  message: string;
+  confirmText: string;
+  onConfirm: () => void;
+  onCancel: () => void;
 };

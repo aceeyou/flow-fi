@@ -1,22 +1,39 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import { KeyboardAvoidingView, Platform } from "react-native";
 import { useSQLiteContext } from "expo-sqlite";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 import ScreenWrapper from "@/components/ScreenWrapper";
 import CreateModalHeader from "@/components/CreateModalHeader";
 import CategoryFormContent from "@/components/CategoryFormContent";
 
-import { CategoriesProps, CreateCategoryFormProps } from "@/types";
+import { CategoriesProps } from "@/types";
 import { EmojiType } from "rn-emoji-keyboard";
 
-const CreatCategory = ({ setShowForm }: CreateCategoryFormProps) => {
+import * as schema from "@/db/schema";
+import { drizzle } from "drizzle-orm/expo-sqlite";
+
+const CreateCategory = ({}) => {
+  const db = useSQLiteContext();
+  const drizzleDb = drizzle(db, { schema });
+  const { categoryType } = useLocalSearchParams<{
+    categoryType: string;
+  }>();
   const [newCategory, setNewCategory] = useState<CategoriesProps>({
-    name: "",
+    category_name: "",
     icon: "💵",
     color: "#09C2A0",
     type: "expense",
   });
+
+  const resetState = () => {
+    setNewCategory({
+      category_name: "",
+      icon: "💵",
+      color: "#09C2A0",
+      type: "expense",
+    });
+  };
 
   // Emoji Picker Function
   const handleEmojiPick = (emojiObject: EmojiType) => {
@@ -34,29 +51,27 @@ const CreatCategory = ({ setShowForm }: CreateCategoryFormProps) => {
   // Resets the value of the newCateory state and closes the create category modal
   const handleCloseModal = () => {
     setNewCategory({
-      name: "",
+      category_name: "",
       icon: "💵",
       color: "#09C2A0",
-      type: "expense",
+      type: categoryType ? categoryType : "expense",
     });
-    setShowForm(false);
+    router.back();
   };
 
   // Handles the insertion of the new category on the database
-  const db = useSQLiteContext();
   const handleSubmitNewCategory = async () => {
     try {
-      await db.runAsync(
-        "INSERT INTO categories (name, icon, color, type) VALUES (?,?,?,?);",
-        [
-          newCategory.name,
-          newCategory.icon,
-          newCategory.color,
-          newCategory.type,
-        ]
-      );
-      setShowForm(false);
-      router.navigate("/");
+      console.log("test category: ", newCategory);
+      await drizzleDb.insert(schema.categories).values({
+        category_name: newCategory.category_name,
+        icon: newCategory.icon,
+        color: newCategory.color,
+        type: categoryType ? categoryType : newCategory.type,
+      });
+      console.log("category created");
+      resetState();
+      router.replace("/");
     } catch (error) {
       console.log(error);
     }
@@ -83,6 +98,4 @@ const CreatCategory = ({ setShowForm }: CreateCategoryFormProps) => {
   );
 };
 
-export default CreatCategory;
-
-const styles = StyleSheet.create({});
+export default CreateCategory;

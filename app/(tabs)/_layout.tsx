@@ -1,10 +1,11 @@
-import { Platform, StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState, Suspense } from "react";
-import { Tabs } from "expo-router";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { router, Tabs } from "expo-router";
 import { colors } from "@/constants/theme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Feather from "@expo/vector-icons/Feather";
 
 const _layout = () => {
   return (
@@ -41,6 +42,7 @@ const _layout = () => {
           headerTitle: "Accounts",
           headerTitleStyle: {
             color: colors.text,
+            fontSize: 18,
           },
           headerStyle: {
             backgroundColor: "#0a0a0a",
@@ -51,6 +53,15 @@ const _layout = () => {
               size={Platform.OS == "android" ? 30 : size}
               color={color}
             />
+          ),
+          headerRight: () => (
+            <Pressable
+              onPress={() => router.push("/createaccount")}
+              style={{ marginRight: 20 }}
+              hitSlop={15}
+            >
+              <Feather name="plus-circle" size={25} color="white" />
+            </Pressable>
           ),
         }}
       />
@@ -76,7 +87,13 @@ const _layout = () => {
       <Tabs.Screen
         name="settings"
         options={{
-          headerShown: false,
+          headerTitle: "Settings",
+          headerTitleStyle: {
+            color: colors.text,
+          },
+          headerStyle: {
+            backgroundColor: "#0a0a0a",
+          },
           tabBarIcon: ({ color, size }) => (
             <MaterialIcons
               name="settings"

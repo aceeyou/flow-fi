@@ -1,14 +1,66 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
-import Typo from "@/components/Typo";
+import { StyleSheet, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
-import { colors } from "@/constants/theme";
+import { colors, radius } from "@/constants/theme";
+import { useFocusEffect } from "expo-router";
+import { AccountProps } from "@/types";
+import { useSQLiteContext } from "expo-sqlite";
+import AccountItem from "@/components/AccountItem";
+import { FlashList } from "@shopify/flash-list";
+import AccountOverviewCard from "@/components/AccountOverviewCard";
+
+const categoryTrxValues = [
+  { value: 200 },
+  { value: 185 },
+  { value: 305 },
+  { value: 44 },
+  { value: 90 },
+  { value: 400 },
+  { value: 250 },
+];
 
 const Accounts = () => {
+  const [accounts, setAccounts] = useState<AccountProps[]>([]);
+  const [totalAccountBalance, setTotalAccountBalance] = useState<
+    { value: number }[]
+  >([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      getData();
+    }, [])
+  );
+
+  useEffect(() => {
+    const balanceTotal = accounts.map((item) => ({
+      value: item.balance,
+    }));
+    setTotalAccountBalance((prev) => [...prev, ...balanceTotal]);
+
+    return () => setTotalAccountBalance([{ value: 0 }]);
+  }, [accounts]);
+
+  const db = useSQLiteContext();
+  async function getData() {
+    const accounts = await db.getAllAsync<AccountProps>(
+      "SELECT * FROM accounts;"
+    );
+    setAccounts([...accounts]);
+  }
+
   return (
-    <View style={[styles.container]}>
-      <Typo>accounts</Typo>
-    </View>
+    <ScreenWrapper modal>
+      <FlashList
+        data={accounts}
+        ListHeaderComponent={() => (
+          <AccountOverviewCard balance={totalAccountBalance} />
+        )}
+        renderItem={({ item }) => <AccountItem key={item.id} data={item} />}
+        contentContainerStyle={{ paddingHorizontal: 15 }}
+        ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+        estimatedItemSize={20}
+      />
+    </ScreenWrapper>
   );
 };
 
@@ -18,5 +70,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
+  },
+  accountCardCtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    height: 130,
+    marginBottom: 20,
+    // marginHorizontal: 12,
+    paddingHorizontal: 30,
+    borderWidth: 1,
+    borderColor: "white",
+    borderRadius: radius._15,
   },
 });
