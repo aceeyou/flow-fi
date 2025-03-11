@@ -46,7 +46,10 @@ const CategoryFormContent = ({
               ]}
             >
               <View style={styles.selectedEmojiContainer}>
-                <Typo size={70} style={{ marginLeft: -0.4 }}>
+                <Typo
+                  size={Platform.OS === "ios" ? 70 : 50}
+                  style={{ marginLeft: -0.4 }}
+                >
                   {newCategory?.icon}
                 </Typo>
               </View>
@@ -122,7 +125,9 @@ const CategoryFormContent = ({
                     marginRight: 15,
                   }}
                 >
-                  <Typo size={24}>{newCategory.icon}</Typo>
+                  <Typo size={Platform.OS === "ios" ? 24 : 18}>
+                    {newCategory.icon}
+                  </Typo>
                 </View>
                 <Typo fontWeight={"700"}>
                   {newCategory.category_name || "Category Name"}

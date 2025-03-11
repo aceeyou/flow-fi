@@ -65,6 +65,7 @@ export type BottomSheetHeaderProps = {
   onClose: () => void;
   onCreate: () => void;
   createLabel?: string;
+  editMode?: boolean;
 };
 
 export type CategoryFormProps = {

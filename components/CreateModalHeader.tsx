@@ -8,6 +8,7 @@ const CreateModalHeader = ({
   onClose,
   onCreate,
   createLabel = "Create",
+  editMode = false,
 }: BottomSheetHeaderProps) => {
   return (
     <View
@@ -24,7 +25,7 @@ const CreateModalHeader = ({
         <MaterialIcons name="close" size={24} color="white" />
       </Pressable>
       <TouchableOpacity onPress={onCreate} hitSlop={20}>
-        <Typo>{createLabel}</Typo>
+        <Typo>{editMode ? "Save" : createLabel}</Typo>
       </TouchableOpacity>
     </View>
   );

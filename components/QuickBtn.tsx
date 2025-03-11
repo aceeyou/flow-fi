@@ -51,12 +51,9 @@ const QuickBtn = ({ quickT, fullWidth = false }: QuickBtnProps) => {
           <View>
             <TouchableOpacity
               style={styles.editBtn}
-              hitSlop={50}
+              hitSlop={25}
               onPress={() =>
-                router.push({
-                  pathname: "/editcategory",
-                  params: { id: quickT.id },
-                })
+                router.push(`/createcategory?id=${quickT.id}&editMode=${1}`)
               }
             >
               <MaterialCommunityIcons

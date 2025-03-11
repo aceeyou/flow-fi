@@ -72,7 +72,6 @@ const _layout = () => {
                 name="createcategory"
                 options={{ presentation: "modal" }}
               />
-              <Stack.Screen name="editcategory" />
               <Stack.Screen
                 name="managecategories"
                 options={{

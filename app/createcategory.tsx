@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import { useSQLiteContext } from "expo-sqlite";
 import { router, useLocalSearchParams } from "expo-router";
@@ -12,12 +12,19 @@ import { EmojiType } from "rn-emoji-keyboard";
 
 import * as schema from "@/db/schema";
 import { drizzle } from "drizzle-orm/expo-sqlite";
+import { eq } from "drizzle-orm";
 
 const CreateCategory = ({}) => {
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
-  const { categoryType } = useLocalSearchParams<{
+  const {
+    categoryType,
+    id,
+    editMode = 0,
+  } = useLocalSearchParams<{
     categoryType: string;
+    id: string;
+    editMode: string;
   }>();
   const [newCategory, setNewCategory] = useState<CategoriesProps>({
     category_name: "",
@@ -26,6 +33,11 @@ const CreateCategory = ({}) => {
     type: "expense",
   });
 
+  useEffect(() => {
+    const edit = editMode as number;
+    if (edit) getCategory();
+  }, [editMode]);
+
   const resetState = () => {
     setNewCategory({
       category_name: "",
@@ -33,6 +45,19 @@ const CreateCategory = ({}) => {
       color: "#09C2A0",
       type: "expense",
     });
+  };
+
+  const getCategory = async () => {
+    const cID = parseInt(id, 10);
+    try {
+      const category = await drizzleDb
+        .select()
+        .from(schema.categories)
+        .where(eq(schema.categories.id, cID));
+      setNewCategory(category[0]);
+    } catch (error) {
+      console.log("createcategory getCategory(): ", error);
+    }
   };
 
   // Emoji Picker Function
@@ -77,6 +102,23 @@ const CreateCategory = ({}) => {
     }
   };
 
+  const handleSaveEdit = async () => {
+    const cID = parseInt(id, 10);
+    try {
+      await drizzleDb
+        .update(schema.categories)
+        .set({ ...newCategory })
+        .where(eq(schema.categories.id, cID))
+        .then(() => {
+          console.log("category updated");
+          resetState();
+          router.replace("/");
+        });
+    } catch (error) {
+      console.log("createcategory handleSaveEdit: ", error);
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -85,7 +127,8 @@ const CreateCategory = ({}) => {
       <ScreenWrapper modal>
         <CreateModalHeader
           onClose={handleCloseModal}
-          onCreate={handleSubmitNewCategory}
+          onCreate={editMode ? handleSaveEdit : handleSubmitNewCategory}
+          editMode={true}
         />
         <CategoryFormContent
           newCategory={newCategory}
