@@ -30,10 +30,11 @@ const CreateCategory = ({}) => {
     category_name: "",
     icon: "💵",
     color: "#09C2A0",
-    type: "expense",
+    type: categoryType ? categoryType : "expense",
   });
 
   useEffect(() => {
+    console.log(newCategory.type);
     const edit = editMode as number;
     if (edit) getCategory();
   }, [editMode]);
