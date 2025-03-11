@@ -1,14 +1,26 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 import Typo from "./Typo";
 import { AccountProps } from "@/types";
 import { useLocales } from "expo-localization";
 import { colors, radius } from "@/constants/theme";
+import { router } from "expo-router";
 
 const AccountItem = ({ data }: { data: AccountProps }) => {
   const [{ currencySymbol }] = useLocales();
+  console.log(data.id);
   return (
-    <View style={[styles.accountItemCtn, { backgroundColor: data.color }]}>
+    <Pressable
+      onPress={() => router.navigate(`/createaccount?editMode=1&id=${data.id}`)}
+      style={[styles.accountItemCtn, { backgroundColor: data.color }]}
+    >
       <View style={styles.iconCtn}>
         {data.isImage ? (
           <Image
@@ -37,7 +49,7 @@ const AccountItem = ({ data }: { data: AccountProps }) => {
           {data.balance}
         </Typo>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

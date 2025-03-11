@@ -34,7 +34,6 @@ const CreateCategory = ({}) => {
   });
 
   useEffect(() => {
-    console.log(newCategory.type);
     const edit = editMode as number;
     if (edit) getCategory();
   }, [editMode]);
@@ -88,14 +87,13 @@ const CreateCategory = ({}) => {
   // Handles the insertion of the new category on the database
   const handleSubmitNewCategory = async () => {
     try {
-      console.log("test category: ", newCategory);
+      // console.log("test category: ", newCategory);
       await drizzleDb.insert(schema.categories).values({
         category_name: newCategory.category_name,
         icon: newCategory.icon,
         color: newCategory.color,
         type: categoryType ? categoryType : newCategory.type,
       });
-      console.log("category created");
       resetState();
       router.replace("/");
     } catch (error) {
@@ -111,7 +109,7 @@ const CreateCategory = ({}) => {
         .set({ ...newCategory })
         .where(eq(schema.categories.id, cID))
         .then(() => {
-          console.log("category updated");
+          // console.log("category updated");
           resetState();
           router.replace("/");
         });

@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
 import Typo from "./Typo";
 import { colors, radius } from "@/constants/theme";
@@ -16,9 +16,14 @@ const HeadsUp = ({ balance }: HeadsUpProps) => {
       <View style={[styles.card]}>
         <Typo size={14}>Account Balance</Typo>
         <View style={[styles.balanceView]}>
-          <Typo size={40} mono color={balanceVisible ? colors.white : "gray"}>
-            P {balanceVisible ? balance : "*****"}
-          </Typo>
+          <Pressable
+            onPress={() => setBalanceVisible((cur) => !cur)}
+            style={{ flex: 1 }}
+          >
+            <Typo size={40} mono color={balanceVisible ? colors.white : "gray"}>
+              P {balanceVisible ? balance : "*****"}
+            </Typo>
+          </Pressable>
           <TouchableOpacity onPress={handleViewBalance}>
             <Feather
               name={balanceVisible ? "eye" : "eye-off"}
