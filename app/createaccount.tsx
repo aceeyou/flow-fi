@@ -99,7 +99,7 @@ const CreateAccount = () => {
       });
       console.log("Account created");
       resetState();
-      router.replace("/");
+      router.replace("/(tabs)/accounts");
     } catch (error) {
       console.log("handleSaveAccount: ", error);
     }

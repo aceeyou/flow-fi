@@ -157,7 +157,9 @@ const CreateAccountContent = ({
                       }}
                     />
                   ) : (
-                    <Typo size={70}>{newAccount?.icon}</Typo>
+                    <Typo size={Platform.OS === "ios" ? 70 : 50}>
+                      {newAccount?.icon}
+                    </Typo>
                   )}
                 </View>
                 <View style={styles.editSelectedEmoji}>
@@ -215,7 +217,9 @@ const CreateAccountContent = ({
                         balance: parseInt(e, 10),
                       }))
                     }
-                    value={newAccount.balance.toString()}
+                    value={
+                      newAccount.balance ? newAccount.balance.toString() : ""
+                    }
                     style={{
                       flex: 1,
                       color: "white",
@@ -269,7 +273,9 @@ const CreateAccountContent = ({
                         }}
                       />
                     ) : (
-                      <Typo size={30}>{newAccount?.icon}</Typo>
+                      <Typo size={Platform.OS === "ios" ? 30 : 20}>
+                        {newAccount?.icon}
+                      </Typo>
                     )}
                   </View>
                   <Typo fontWeight={"700"}>
