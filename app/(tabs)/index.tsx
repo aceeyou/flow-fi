@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSQLiteContext } from "expo-sqlite";
 import { useFocusEffect } from "expo-router";
@@ -27,16 +27,6 @@ const Home = () => {
       getData();
     }, [])
   );
-
-  // useEffect(() => {
-  //   const tableDelete = async () => {
-  //     await drizzleDb.delete(schema.accounts);
-  //     await drizzleDb.delete(schema.categories);
-  //     await drizzleDb.delete(schema.transactions);
-  //   };
-
-  //   tableDelete();
-  // }, []);
 
   async function getData() {
     const expensesResult = await drizzleDb

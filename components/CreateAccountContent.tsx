@@ -19,13 +19,11 @@ import {
   TextInput,
 } from "react-native-gesture-handler";
 import { AccountFormProps } from "@/types";
-import { useLocales } from "expo-localization";
 import * as ImagePicker from "expo-image-picker";
 import ScreenWrapper from "./ScreenWrapper";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import * as FileSystem from "expo-file-system";
-import Feather from "@expo/vector-icons/Feather";
 
 const CreateAccountContent = ({
   newAccount,
@@ -34,7 +32,6 @@ const CreateAccountContent = ({
   onSelectColor,
 }: AccountFormProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [{ currencySymbol }] = useLocales();
   const [chooseEmoji, setChooseEmoji] = useState<boolean>(false);
 
   const pickImage = async () => {
@@ -208,7 +205,7 @@ const CreateAccountContent = ({
               <View style={[styles.inputContainer]}>
                 <Typo style={{ opacity: 0.5, marginRight: 10 }}>Balance</Typo>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Typo size={20}>{currencySymbol}</Typo>
+                  <Typo size={20}>₱</Typo>
                   <TextInput
                     keyboardType="decimal-pad"
                     onChangeText={(e: string) =>

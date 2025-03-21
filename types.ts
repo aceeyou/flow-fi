@@ -1,5 +1,11 @@
 import React, { ReactNode, SetStateAction } from "react";
-import { TextProps, TextStyle, ViewStyle } from "react-native";
+import {
+  NativeSyntheticEvent,
+  TextInputChangeEventData,
+  TextProps,
+  TextStyle,
+  ViewStyle,
+} from "react-native";
 import { EmojiType } from "rn-emoji-keyboard";
 import { categories } from "./db/schema";
 import { ParamListBase } from "@react-navigation/native";
@@ -21,6 +27,15 @@ export type AccountProps = {
   color: string;
   imageUri: string;
   savedUri: string;
+};
+
+export type AccountSchemaProp = {
+  id?: number;
+  account_name: string;
+  balance: number;
+  isImage: number;
+  icon: string;
+  color: string;
 };
 
 export type ScreenWrapperProps = {
@@ -59,13 +74,16 @@ export type QuickTransactionListProps = {
 export type QuickBtnProps = {
   quickT: CategoriesProps;
   fullWidth?: boolean;
+  transaction?: boolean;
 };
 
 export type BottomSheetHeaderProps = {
   onClose: () => void;
   onCreate: () => void;
+  category?: { name: string; icon: string };
   createLabel?: string;
   editMode?: boolean;
+  closeOnly?: boolean;
 };
 
 export type CategoryFormProps = {
@@ -115,4 +133,13 @@ export type DialogProps = {
   confirmText: string;
   onConfirm: () => void;
   onCancel: () => void;
+};
+
+export type TransactionProps = {
+  id?: number;
+  category_id: number;
+  account_id: number;
+  amount: number;
+  description: string;
+  type: string;
 };

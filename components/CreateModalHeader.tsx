@@ -7,8 +7,10 @@ import { BottomSheetHeaderProps } from "@/types";
 const CreateModalHeader = ({
   onClose,
   onCreate,
+  category,
   createLabel = "Create",
   editMode = false,
+  closeOnly = false,
 }: BottomSheetHeaderProps) => {
   return (
     <View
@@ -24,9 +26,15 @@ const CreateModalHeader = ({
       <Pressable onPress={onClose} hitSlop={20}>
         <MaterialIcons name="close" size={24} color="white" />
       </Pressable>
-      <TouchableOpacity onPress={onCreate} hitSlop={20}>
-        <Typo>{editMode ? "Save" : createLabel}</Typo>
-      </TouchableOpacity>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+        <Typo>{category && category.icon}</Typo>
+        <Typo fontWeight="600">{category && category.name}</Typo>
+      </View>
+      {!closeOnly && (
+        <TouchableOpacity onPress={onCreate} hitSlop={20}>
+          <Typo>{editMode ? "Save" : createLabel}</Typo>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

@@ -49,12 +49,12 @@ const CreateAccount = () => {
 
   const getAccount = async () => {
     const aID = parseInt(id, 10);
-    console.log(id);
     try {
       const account = await drizzleDb
         .select()
         .from(schema.accounts)
         .where(eq(schema.accounts.id, aID));
+
       setNewAccount({
         account_name: account[0].account_name,
         balance: account[0].balance,
@@ -75,7 +75,7 @@ const CreateAccount = () => {
   };
   // Handles the insertion of the new category on the database
   const handleSubmitNewAccount = async () => {
-    console.log("clicked");
+    console.log(newAccount.isImage);
     // transfer image to local APP storage
     if (newAccount.isImage) {
       await FileSystem.copyAsync({
@@ -95,9 +95,9 @@ const CreateAccount = () => {
         balance: newAccount.balance,
         color: newAccount.color,
         icon: newAccount.icon,
-        isImage: newAccount.isImage ? true : false,
+        isImage: newAccount.isImage,
       });
-      console.log("Account created");
+      // console.log("Account created");
       resetState();
       router.replace("/(tabs)/accounts");
     } catch (error) {
@@ -115,10 +115,11 @@ const CreateAccount = () => {
           balance: newAccount.balance,
           color: newAccount.color,
           icon: newAccount.icon,
-          isImage: newAccount.isImage ? true : false,
+          isImage: newAccount.isImage,
         })
         .where(eq(schema.accounts.id, aID));
       // console.log("account edited");
+      resetState();
       router.replace("/(tabs)/accounts");
     } catch (error) {
       console.log("createaccount handleSaveEdit: ", error);

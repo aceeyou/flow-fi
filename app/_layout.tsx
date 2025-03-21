@@ -11,7 +11,6 @@ import {
   GestureHandlerRootView,
   Pressable,
 } from "react-native-gesture-handler";
-import * as SQLite from "expo-sqlite";
 
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import Feather from "@expo/vector-icons/Feather";
@@ -32,15 +31,6 @@ const _layout = () => {
       SplashScreen.hideAsync();
     }
   }, [loaded, font_error]);
-
-  // useEffect(() => {
-  //   try {
-  //     SQLite.deleteDatabaseAsync("flowfidev");
-  //     console.log("db deteleted");
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }, []);
 
   if (!loaded && !font_error) {
     return null;
@@ -73,6 +63,10 @@ const _layout = () => {
                 options={{ presentation: "modal" }}
               />
               <Stack.Screen
+                name="createtransaction"
+                options={{ presentation: "modal" }}
+              />
+              <Stack.Screen
                 name="managecategories"
                 options={{
                   headerShown: true,
@@ -99,6 +93,7 @@ const _layout = () => {
                   ),
                 }}
               />
+              <Stack.Screen name="picker" options={{ presentation: "modal" }} />
             </Stack>
           </BottomSheetModalProvider>
         </GestureHandlerRootView>

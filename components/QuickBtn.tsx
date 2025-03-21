@@ -23,17 +23,25 @@ const categorieTrxValues = [
   { value: 400 },
 ];
 
-const QuickBtn = ({ quickT, fullWidth = false }: QuickBtnProps) => {
+const QuickBtn = ({
+  quickT,
+  fullWidth = false,
+  transaction = false,
+}: QuickBtnProps) => {
   return (
     <TouchableOpacity
       style={[
         styles.container,
         {
           backgroundColor: quickT.color,
-          width: fullWidth ? "100%" : (Dimensions.get("screen").width - 46) / 2,
+          width: fullWidth ? "100%" : (Dimensions.get("screen").width - 38) / 2,
         },
       ]}
       activeOpacity={0.5}
+      onPress={() =>
+        !transaction &&
+        router.navigate(`/createtransaction?category_id=${quickT.id}`)
+      }
     >
       <View style={[styles.iconContainer]}>
         <Typo size={20}>{quickT.icon}</Typo>
@@ -42,27 +50,33 @@ const QuickBtn = ({ quickT, fullWidth = false }: QuickBtnProps) => {
         <Typo size={14} fontWeight="600">
           {quickT.category_name}
         </Typo>
-        <Typo size={10} fontWeight={"400"}>
-          P 365.00
+        <Typo size={transaction ? 12 : 10} fontWeight={"400"}>
+          {transaction
+            ? quickT.type.charAt(0).toUpperCase() + quickT.type.slice(1)
+            : "P 365.00"}
         </Typo>
       </View>
       <View style={{ position: "absolute", right: 15, top: 20 }}>
         {fullWidth ? (
-          <View>
-            <TouchableOpacity
-              style={styles.editBtn}
-              hitSlop={25}
-              onPress={() =>
-                router.push(`/createcategory?id=${quickT.id}&editMode=${1}`)
-              }
-            >
-              <MaterialCommunityIcons
-                name="dots-horizontal-circle-outline"
-                size={24}
-                color={colors.neutral100}
-              />
-            </TouchableOpacity>
-          </View>
+          transaction ? (
+            ""
+          ) : (
+            <View>
+              <TouchableOpacity
+                style={styles.editBtn}
+                hitSlop={25}
+                onPress={() =>
+                  router.push(`/createcategory?id=${quickT.id}&editMode=${1}`)
+                }
+              >
+                <MaterialCommunityIcons
+                  name="dots-horizontal-circle-outline"
+                  size={24}
+                  color={colors.neutral100}
+                />
+              </TouchableOpacity>
+            </View>
+          )
         ) : (
           <LineChart
             data={categorieTrxValues}

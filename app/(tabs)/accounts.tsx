@@ -66,21 +66,4 @@ const Accounts = () => {
 
 export default Accounts;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.bg,
-  },
-  accountCardCtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    height: 130,
-    marginBottom: 20,
-    // marginHorizontal: 12,
-    paddingHorizontal: 30,
-    borderWidth: 1,
-    borderColor: "white",
-    borderRadius: radius._15,
-  },
-});
+const styles = StyleSheet.create({});

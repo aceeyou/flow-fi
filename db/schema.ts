@@ -14,7 +14,7 @@ export const accounts = sqliteTable("accounts", {
   id: t.int("id").primaryKey({ autoIncrement: true }),
   account_name: t.text("account_name").notNull(),
   balance: t.int("balance").notNull().default(0),
-  isImage: t.int("isImage", { mode: "boolean" }),
+  isImage: t.int("isImage").notNull().default(0),
   icon: t.text("icon").notNull().default("💶"),
   color: t.text("color").notNull().default("#09C2A0"),
 });
