@@ -30,7 +30,7 @@ export type AccountProps = {
 };
 
 export type AccountSchemaProp = {
-  id?: number;
+  id: number;
   account_name: string;
   balance: number;
   isImage: number;
@@ -139,7 +139,11 @@ export type TransactionProps = {
   id?: number;
   category_id: number;
   account_id: number;
-  amount: number;
+  amount: string;
   description: string;
   type: string;
+  transaction_date: string;
+  icon?: string;
+  category_name?: string;
+  account_name?: string;
 };

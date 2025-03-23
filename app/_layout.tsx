@@ -16,6 +16,7 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import Feather from "@expo/vector-icons/Feather";
 
 import { colors } from "@/constants/theme";
+import ToastManager from "toastify-react-native";
 
 const _layout = () => {
   const [loaded, font_error] = useFonts({
@@ -42,6 +43,20 @@ const _layout = () => {
 
   return (
     <Suspense fallback={<ActivityIndicator size={"large"} />}>
+      <ToastManager
+        position="top"
+        style={{
+          with: "100%",
+          flexWrap: "wrap",
+          padding: 3,
+          paddingVertical: 0,
+          height: 50,
+        }}
+        textStyle={{ width: "contain", fontSize: 14 }}
+        positionValue={80}
+        showProgressBar={false}
+        showCloseIcon={false}
+      />
       <SQLiteProvider databaseName="flowfidev" useSuspense>
         <GestureHandlerRootView>
           <BottomSheetModalProvider>

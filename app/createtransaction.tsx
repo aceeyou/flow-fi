@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 import CreateModalHeader from "@/components/CreateModalHeader";
@@ -11,8 +11,6 @@ import {
   TouchableOpacity,
   Keyboard,
   Modal,
-  NativeSyntheticEvent,
-  TextInputChangeEventData,
 } from "react-native";
 import * as schema from "@/db/schema";
 import { drizzle } from "drizzle-orm/expo-sqlite";
@@ -23,13 +21,16 @@ import CalculatorPad from "@/components/CalculatorPad";
 import AccountItem from "@/components/AccountItem";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { PanGestureHandler } from "react-native-gesture-handler";
 import { FlashList } from "@shopify/flash-list";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import ToastManager, { Toast } from "toastify-react-native";
 
 const CreateTransaction = () => {
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
   const { category_id } = useLocalSearchParams<{ category_id: string }>();
+  const inputRef = useRef<TextInput>(null);
+  const [amountMissing, setAmountMissing] = useState<boolean>(false);
 
   const [repeating, setRepeating] = useState<boolean>(false);
   const [viewRepeatDatePicker, setRepeatDatePicker] = useState<boolean>(false);
@@ -46,6 +47,7 @@ const CreateTransaction = () => {
   });
   const [accounts, setAccounts] = useState<AccountSchemaProp[]>([
     {
+      id: 0,
       account_name: "",
       balance: 0,
       isImage: 0,
@@ -56,13 +58,22 @@ const CreateTransaction = () => {
   const [transaction, setTransaction] = useState<TransactionProps>({
     category_id: parseInt(category_id, 10),
     account_id: 0,
-    amount: 0,
+    amount: "0",
     description: "",
     type: "expense",
+    transaction_date: "",
   });
+
+  const handleEditTransactionAmount = (num: string) => {
+    setTransaction((cur) => ({
+      ...cur,
+      amount: num,
+    }));
+  };
 
   const [viewAccountsList, setViewAccountsList] = useState<boolean>(false);
   const [accountSelected, setAccountSelected] = useState<AccountSchemaProp>({
+    id: accounts[0].id,
     account_name: accounts[0]?.account_name,
     balance: accounts[0]?.balance,
     isImage: accounts[0]?.isImage,
@@ -75,6 +86,10 @@ const CreateTransaction = () => {
     getAllAccounts();
   }, []);
 
+  useEffect(() => {
+    setAmountMissing(false);
+  }, [transaction.amount]);
+
   const getCategory = async () => {
     const id = parseInt(category_id, 10);
     try {
@@ -82,7 +97,7 @@ const CreateTransaction = () => {
         .select()
         .from(schema.categories)
         .where(eq(schema.categories.id, id));
-      //   console.log(category);
+      // console.log(category);
       setCategory(category[0]);
     } catch (error) {
       console.log("createtransaction useEffect: ", error);
@@ -131,7 +146,6 @@ const CreateTransaction = () => {
 
   // Modal Account Picker
   const handleOnSelectAccount = (account: AccountSchemaProp) => {
-    console.log(account);
     setAccountSelected(account);
     handleCloseAccountPicker();
   };
@@ -144,40 +158,103 @@ const CreateTransaction = () => {
     setTransaction({
       category_id: 1,
       account_id: 1,
-      amount: 0,
+      amount: "0",
       description: "",
       type: "expense",
+      transaction_date: "",
     });
   };
   const handleCloseModal = () => {
     resetState();
     router.back();
   };
-  const handleSubmitNewAccount = () => {};
+  const handlePressOutside = () => {
+    inputRef.current?.blur();
+  };
+
+  const handleSubmitNewTransaction = async () => {
+    if (transaction.amount === "0") {
+      setAmountMissing(true);
+      return;
+    }
+    try {
+      await drizzleDb
+        .insert(schema.transactions)
+        .values({
+          category_id: transaction.category_id,
+          account_id: accountSelected.id,
+          amount: transaction.amount,
+          description: transaction.description,
+          type: category.type,
+          transaction_date: transactionDate
+            ? transactionDate.toString()
+            : new Date().toString(),
+        })
+        .then(async () => {
+          await drizzleDb
+            .update(schema.accounts)
+            .set({
+              balance:
+                category.type === "expense"
+                  ? accountSelected.balance - Number(transaction.amount)
+                  : accountSelected.balance + Number(transaction.amount),
+            })
+            .where(eq(schema.accounts.id, accountSelected.id));
+          // Toast.success("Transaction recorded 🥳");
+          router.replace("/");
+        });
+    } catch (error) {
+      console.log("create transaction error: ", error);
+      Toast.error("Transaction wasn't recorded");
+      router.replace("/");
+    }
+  };
 
   return (
     <ScreenWrapper modal>
+      <ToastManager
+        position="top"
+        positionValue={50}
+        height={50}
+        duration={1500}
+        showProgressBar={false}
+        showCloseIcon={false}
+      />
       <CreateModalHeader
         onClose={handleCloseModal}
-        onCreate={handleSubmitNewAccount}
+        onCreate={handleSubmitNewTransaction}
         category={{ name: category.category_name, icon: category.icon }}
         editMode
       />
       <View style={{ paddingHorizontal: 13 }}>
-        <View style={styles.displayContainer}>
+        <TouchableWithoutFeedback
+          onPress={handlePressOutside}
+          style={styles.displayContainer}
+        >
           <Typo size={50} fontWeight="600">
             ₱ {transaction.amount.toLocaleString()}
           </Typo>
-        </View>
+          {amountMissing && (
+            <Typo
+              style={{ color: "yellow", position: "absolute", bottom: 10 }}
+              color={"#d19c1f"}
+            >
+              Set amount to save
+            </Typo>
+          )}
+        </TouchableWithoutFeedback>
         <View style={styles.transactionOptionsContainer}>
           <Typo size={14} color={colors.neutral400}>
             Transaction Note
           </Typo>
           <TextInput
+            ref={inputRef}
             style={styles.noteInput}
+            returnKeyType="none"
+            onSubmitEditing={Keyboard.dismiss}
             placeholder="What is this for?"
             multiline
-            value={transaction.description}
+            value={transaction?.description}
             onChangeText={(e) =>
               setTransaction((cur) => ({ ...cur, description: e }))
             }
@@ -193,59 +270,66 @@ const CreateTransaction = () => {
             />
           </View>
           <View style={styles.transactionTogglesContainer}>
-            <TouchableOpacity
-              style={[
-                styles.transactionOptionToggle,
-                {
-                  backgroundColor: repeating ? colors.secondary : "",
-                  flexDirection: "column",
-                  gap: 0,
-                  paddingVertical: repeatDate !== null ? 9 : 15,
-                },
-              ]}
-              onPress={handleRepeatDateClick}
-            >
-              <View style={[styles.repeatDateContent]}>
-                <MaterialIcons
-                  name="event-repeat"
-                  size={repeatDate ? 14 : 18}
-                  color={repeatDate !== null ? colors.text : colors.neutral500}
-                />
-                <Typo
-                  color={repeatDate !== null ? colors.text : colors.neutral500}
-                  size={repeatDate ? 14 : 18}
-                  fontWeight={repeating ? "600" : "400"}
-                >
-                  Repeat
-                </Typo>
-              </View>
-              <View>
-                {repeatDate !== null && (
-                  <Typo size={14}>
-                    every{" "}
-                    <Typo size={14} fontWeight={"700"}>
-                      {repeatDate?.toLocaleDateString(undefined, {
-                        day: "numeric",
-                      })}
-                      {repeatDate?.toLocaleDateString(undefined, {
-                        day: "numeric",
-                      }) === "1"
-                        ? "st"
-                        : repeatDate?.toLocaleDateString(undefined, {
-                            day: "numeric",
-                          }) === "2"
-                        ? "nd"
-                        : repeatDate?.toLocaleDateString(undefined, {
-                            day: "numeric",
-                          }) === "3"
-                        ? "rd"
-                        : "th"}{" "}
-                    </Typo>
-                    day
+            {category.type === "expense" && (
+              <TouchableOpacity
+                style={[
+                  styles.transactionOptionToggle,
+                  {
+                    backgroundColor: repeating ? colors.secondary : "",
+                    flexDirection: "column",
+                    gap: 0,
+                    paddingVertical: repeatDate !== null ? 9 : 15,
+                  },
+                ]}
+                onPress={handleRepeatDateClick}
+              >
+                <View style={[styles.repeatDateContent]}>
+                  <MaterialIcons
+                    name="event-repeat"
+                    size={repeatDate ? 14 : 18}
+                    color={
+                      repeatDate !== null ? colors.text : colors.neutral500
+                    }
+                  />
+                  <Typo
+                    color={
+                      repeatDate !== null ? colors.text : colors.neutral500
+                    }
+                    size={repeatDate ? 14 : 18}
+                    fontWeight={repeating ? "600" : "400"}
+                  >
+                    Repeat
                   </Typo>
-                )}
-              </View>
-            </TouchableOpacity>
+                </View>
+                <View>
+                  {repeatDate !== null && (
+                    <Typo size={14}>
+                      every{" "}
+                      <Typo size={14} fontWeight={"700"}>
+                        {repeatDate?.toLocaleDateString(undefined, {
+                          day: "numeric",
+                        })}
+                        {repeatDate?.toLocaleDateString(undefined, {
+                          day: "numeric",
+                        }) === "1"
+                          ? "st"
+                          : repeatDate?.toLocaleDateString(undefined, {
+                              day: "numeric",
+                            }) === "2"
+                          ? "nd"
+                          : repeatDate?.toLocaleDateString(undefined, {
+                              day: "numeric",
+                            }) === "3"
+                          ? "rd"
+                          : "th"}{" "}
+                      </Typo>
+                      day
+                    </Typo>
+                  )}
+                </View>
+              </TouchableOpacity>
+            )}
+
             <TouchableOpacity
               style={[styles.transactionOptionToggle]}
               onPress={() => setViewDatePicker(true)}
@@ -268,7 +352,10 @@ const CreateTransaction = () => {
         </View>
       </View>
 
-      <CalculatorPad />
+      <CalculatorPad
+        onPress={handleEditTransactionAmount}
+        amount={transaction.amount}
+      />
       <DateTimePickerModal
         mode="datetime"
         isVisible={viewDatePicker}
@@ -327,6 +414,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: radius._10,
     alignItems: "center",
+    position: "relative",
   },
   transactionOptionsContainer: {
     marginTop: 8,

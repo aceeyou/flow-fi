@@ -23,23 +23,38 @@ export const transactions = sqliteTable("transactions", {
   id: t.int("id").primaryKey({ autoIncrement: true }),
   category_id: t
     .int("category_id")
+    .notNull()
+    .default(0)
     .references((): AnySQLiteColumn => categories.id),
   account_id: t
     .int("account_id")
+    .notNull()
+    .default(0)
     .references((): AnySQLiteColumn => accounts.id),
-  amount: t.int("amount").notNull(),
-  description: t.text("description"),
-  type: t
-    .text("type")
-    .notNull()
-    .$type<
-      "expense" | "income" | "lend" | "borrow" | "invest" | "subscription"
-    >()
-    .notNull()
-    .default("expense"),
+  amount: t.text("amount").notNull().default("0"),
+  description: t.text("description").notNull(),
+  type: t.text("type").notNull(),
   transaction_date: t
     .text("transaction_date")
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
-  created_at: t.text("created_at").default(sql`CURRENT_TIMESTAMP`),
+  created_at: t
+    .text("created_at")
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const repeating_transactions = sqliteTable("repeatingTransactions", {
+  id: t.int("id").primaryKey({ autoIncrement: true }),
+  transaction_id: t
+    .int("transaction_id")
+    .notNull()
+    .default(0)
+    .references((): AnySQLiteColumn => transactions.id),
+  active: t.int("active").notNull().default(1),
+  day_to_repeat: t.text("day_to_repeat").notNull(),
+  latest_recursion_date: t
+    .text("latest_recursion_date")
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
 });
