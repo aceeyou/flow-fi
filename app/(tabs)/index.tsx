@@ -1,10 +1,10 @@
-import { ScrollView, StyleSheet } from "react-native";
-import React, { useCallback, useState } from "react";
+import { ScrollView } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useSQLiteContext } from "expo-sqlite";
 import { useFocusEffect } from "expo-router";
 import { drizzle } from "drizzle-orm/expo-sqlite";
-import { eq, sum } from "drizzle-orm";
+import { eq, or, sum } from "drizzle-orm";
 import * as schema from "@/db/schema";
 
 import ScreenWrapper from "@/components/ScreenWrapper";
@@ -22,10 +22,34 @@ const Home = () => {
   const [income, setIncome] = useState<CategoriesProps[]>([]);
   const [totalAccountBalance, setTotalAccountBalance] = useState<number>(0);
 
+  // Change this to insert Cash Account from the first initiation of the app only
+  useEffect(() => {
+    async function getCash() {
+      const result = await drizzleDb
+        .select()
+        .from(schema.accounts)
+        .where(
+          or(
+            eq(schema.accounts.account_name, "cash"),
+            eq(schema.accounts.account_name, "Cash")
+          )
+        );
+      if (result.length === 0) {
+        await drizzleDb.insert(schema.accounts).values({
+          account_name: "Cash",
+          isImage: 0,
+          icon: "💵",
+          color: "#09C2A0",
+        });
+      }
+    }
+    getCash();
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
       getData();
-    }, [])
+    }, [db])
   );
 
   async function getData() {
@@ -43,11 +67,27 @@ const Home = () => {
         count: sum(schema.accounts.balance),
       })
       .from(schema.accounts);
-
-    // console.log(expensesResult);
     setTotalAccountBalance(Number(totalAccountBalance[0].count));
-    setExpense(expensesResult);
-    setIncome(incomeResult);
+    setExpense([
+      ...expensesResult,
+      {
+        id: 0,
+        category_name: "add_another_category",
+        icon: "",
+        color: "",
+        type: "expense",
+      },
+    ]);
+    setIncome([
+      ...incomeResult,
+      {
+        id: 0,
+        category_name: "add_another_category",
+        icon: "",
+        color: "",
+        type: "income",
+      },
+    ]);
   }
 
   return (
@@ -70,5 +110,3 @@ const Home = () => {
 };
 
 export default Home;
-
-const styles = StyleSheet.create({});

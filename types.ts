@@ -81,6 +81,7 @@ export type BottomSheetHeaderProps = {
   onClose: () => void;
   onCreate: () => void;
   category?: { name: string; icon: string };
+  modalTitle?: string;
   createLabel?: string;
   editMode?: boolean;
   closeOnly?: boolean;

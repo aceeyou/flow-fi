@@ -32,7 +32,7 @@ const HeadsUp = ({ balance }: HeadsUpProps) => {
             />
           </TouchableOpacity>
         </View>
-        <View style={[styles.quickTransactionControl]}>
+        {/* <View style={[styles.quickTransactionControl]}>
           <TouchableOpacity style={[styles.quickBtn]}>
             <Typo style={{ alignSelf: "center" }} size={15}>
               Pay
@@ -43,7 +43,7 @@ const HeadsUp = ({ balance }: HeadsUpProps) => {
               Transfer
             </Typo>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     </View>
   );

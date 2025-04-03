@@ -64,7 +64,7 @@ const Transaction = ({ data }: { data: TransactionProps }) => {
         <Typo size={14} color={colors.neutral400}>
           {new Date(transactionData.transaction_date).toLocaleString(
             "default",
-            { month: "short" }
+            { month: "long" }
           ) +
             " " +
             new Date(transactionData.transaction_date).getDate()}

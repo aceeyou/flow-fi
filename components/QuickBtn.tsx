@@ -1,10 +1,4 @@
-import {
-  Dimensions,
-  Pressable,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import React from "react";
 import Typo from "./Typo";
 import { LineChart } from "react-native-gifted-charts";
@@ -12,6 +6,7 @@ import { QuickBtnProps } from "@/types";
 import { colors, radius } from "@/constants/theme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 // Fetch values from transactions table
 const categorieTrxValues = [
@@ -31,65 +26,85 @@ const QuickBtn = ({
   return (
     <TouchableOpacity
       style={[
-        styles.container,
+        quickT.category_name === "add_another_category"
+          ? styles.quickAddCategoryBtn
+          : styles.container,
         {
           backgroundColor: quickT.color,
           width: fullWidth ? "100%" : (Dimensions.get("screen").width - 38) / 2,
         },
       ]}
       activeOpacity={0.5}
-      onPress={() =>
+      onPress={() => {
+        if (quickT.category_name === "add_another_category") {
+          router.navigate(`/createcategory?categoryType=${quickT.type}`);
+          return;
+        }
+
         !transaction &&
-        router.navigate(`/createtransaction?category_id=${quickT.id}`)
-      }
+          router.navigate(`/createtransaction?category_id=${quickT.id}`);
+      }}
     >
-      <View style={[styles.iconContainer]}>
-        <Typo size={20}>{quickT.icon}</Typo>
-      </View>
-      <View>
-        <Typo size={14} fontWeight="600">
-          {quickT.category_name}
-        </Typo>
-        <Typo size={transaction ? 12 : 10} fontWeight={"400"}>
-          {transaction
-            ? quickT.type.charAt(0).toUpperCase() + quickT.type.slice(1)
-            : "P 365.00"}
-        </Typo>
-      </View>
-      <View style={{ position: "absolute", right: 15, top: 20 }}>
-        {fullWidth ? (
-          transaction ? (
-            ""
-          ) : (
-            <View>
-              <TouchableOpacity
-                style={styles.editBtn}
-                hitSlop={25}
-                onPress={() =>
-                  router.push(`/createcategory?id=${quickT.id}&editMode=${1}`)
-                }
-              >
-                <MaterialCommunityIcons
-                  name="dots-horizontal-circle-outline"
-                  size={24}
-                  color={colors.neutral100}
-                />
-              </TouchableOpacity>
-            </View>
-          )
-        ) : (
-          <LineChart
-            data={categorieTrxValues}
-            curved
-            color={"#ffffff8f"}
-            hideAxesAndRules
-            hideDataPoints
-            spacing={4}
-            width={60}
-            height={20}
-          />
-        )}
-      </View>
+      {quickT.category_name === "add_another_category" ? (
+        <>
+          <View style={[styles.quickAddCategoryIcon]}>
+            <MaterialIcons name="add" size={18} color="white" />
+          </View>
+          <Typo size={14}>Add a category</Typo>
+        </>
+      ) : (
+        <>
+          <View style={[styles.iconContainer]}>
+            <Typo size={20}>{quickT.icon}</Typo>
+          </View>
+          <View>
+            <Typo size={14} fontWeight="600">
+              {quickT.category_name}
+            </Typo>
+            <Typo size={transaction ? 12 : 10} fontWeight={"400"}>
+              {transaction
+                ? quickT.type.charAt(0).toUpperCase() + quickT.type.slice(1)
+                : "P 365.00"}
+            </Typo>
+          </View>
+          <View style={{ position: "absolute", right: 15, top: 20 }}>
+            {fullWidth ? (
+              transaction ? (
+                ""
+              ) : (
+                <View>
+                  <TouchableOpacity
+                    style={styles.editBtn}
+                    hitSlop={25}
+                    onPress={() =>
+                      router.push(
+                        `/createcategory?id=${quickT.id}&editMode=${1}`
+                      )
+                    }
+                  >
+                    <MaterialCommunityIcons
+                      name="dots-horizontal-circle-outline"
+                      size={24}
+                      color={colors.neutral100}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )
+            ) : (
+              <LineChart
+                data={categorieTrxValues}
+                curved
+                color={"#ffffff8f"}
+                hideAxesAndRules
+                hideDataPoints
+                spacing={4}
+                width={60}
+                height={20}
+              />
+            )}
+          </View>
+        </>
+      )}
     </TouchableOpacity>
   );
 };
@@ -120,6 +135,27 @@ const styles = StyleSheet.create({
   editBtn: {
     borderRadius: 100,
     padding: 1,
-    // backgroundColor: colors.icon_bg,
+  },
+  quickAddCategoryBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 15,
+    padding: 15,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: "white",
+    borderRadius: radius._10,
+    opacity: 0.15,
+  },
+  quickAddCategoryIcon: {
+    borderWidth: 1,
+    borderColor: "white",
+    borderRadius: radius._3,
+    width: 25,
+    aspectRatio: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

@@ -8,17 +8,24 @@ import { router, useLocalSearchParams } from "expo-router";
 import { EmojiType } from "rn-emoji-keyboard";
 import { useSQLiteContext } from "expo-sqlite";
 import * as FileSystem from "expo-file-system";
-import ToastManager, { Toast } from "toastify-react-native";
+// import ToastManager, { Toast } from "toastify-react-native";
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import * as schema from "@/db/schema";
 import { eq } from "drizzle-orm";
+import Toast from "react-native-toast-message";
+import { CustomToastConfig } from "@/components/CustomToast/CustomToast";
 
 const CreateAccount = () => {
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
-  const { editMode = 0, id } = useLocalSearchParams<{
+  const {
+    editMode = 0,
+    id,
+    create = false,
+  } = useLocalSearchParams<{
     editMode: string;
     id: string;
+    create: string;
   }>();
   const [newAccount, setNewAccount] = useState<AccountProps>({
     account_name: "",
@@ -29,6 +36,11 @@ const CreateAccount = () => {
     icon: "💵",
     color: "#09C2A0",
   });
+
+  useEffect(() => {
+    create &&
+      alert('You need to create an "Account" to record your transactions');
+  }, []);
 
   useEffect(() => {
     const edit = editMode as number;
@@ -85,7 +97,11 @@ const CreateAccount = () => {
     }
 
     if (newAccount.account_name === "") {
-      Toast.error("Account name must be filled");
+      Toast.show({
+        type: "error",
+        text1: "Account name must be filled",
+        position: "bottom",
+      });
       return;
     }
 
@@ -98,7 +114,16 @@ const CreateAccount = () => {
         isImage: newAccount.isImage,
       });
       // console.log("Account created");
+      Toast.show({
+        type: "success",
+        text1: "✅ Account has been added",
+        position: "bottom",
+      });
       resetState();
+      if (create) {
+        router.back();
+        return;
+      }
       router.replace("/(tabs)/accounts");
     } catch (error) {
       console.log("handleSaveAccount: ", error);
@@ -147,7 +172,7 @@ const CreateAccount = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
     >
-      <ToastManager
+      {/* <ToastManager
         animationInTiming={500}
         animationOutTiming={300}
         showCloseIcon={false}
@@ -156,11 +181,17 @@ const CreateAccount = () => {
         height={60}
         style={{ backgroundColor: "#efefefdf" }}
         textStyle={{ marginLeft: 10 }}
+      /> */}
+      <Toast
+        position="bottom"
+        config={CustomToastConfig}
+        visibilityTime={2000}
       />
       <ScreenWrapper modal>
         <CreateModalHeader
           onClose={handleCloseModal}
           onCreate={editMode ? handleSaveEdit : handleSubmitNewAccount}
+          modalTitle="Create Account"
           editMode={true}
         />
         <CreateAccountContent

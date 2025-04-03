@@ -10,6 +10,8 @@ import Dialog from "./Dialog";
 
 import * as schema from "@/db/schema";
 import { drizzle } from "drizzle-orm/expo-sqlite";
+// import { Toast } from "toastify-react-native";
+import Toast from "react-native-toast-message";
 
 const SettingsItem = <
   ParamList extends ParamListBase,
@@ -36,23 +38,33 @@ const SettingsItem = <
   const handleDeleteData = () => {
     dropDB();
     setConfirmDelete(false);
-    router.navigate("/");
     return;
   };
 
   const dropDB = async () => {
     try {
-      const tables = await drizzleDb.all<{ name: string }>(
-        `SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'`
-      );
+      // const tables = await drizzleDb.all<{ name: string }>(
+      //   `SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'`
+      // );
 
-      for (const table of tables) {
-        console.log(table.name);
-        await drizzleDb.run(`DROP TABLE IF EXISTS ${table.name}`);
-      }
+      // for (const table of tables) {
+      //   console.log(table.name);
+      //   await drizzleDb.run(`DROP TABLE IF EXISTS ${table.name}`);
+      // }
+
+      await drizzleDb.delete(schema.repeating_transactions);
+      await drizzleDb.delete(schema.transactions);
+      await drizzleDb.delete(schema.accounts);
+      await drizzleDb.delete(schema.categories);
 
       console.log("db dropped");
-      router.navigate("/");
+      // router.replace("/");
+      // Toast.info("Data has been deleted", "bottom");
+      Toast.show({
+        type: "success",
+        text1: "✅ Data has been deleted",
+        position: "bottom",
+      });
     } catch (error) {
       console.log(error);
     }

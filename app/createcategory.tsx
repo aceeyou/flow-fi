@@ -13,6 +13,7 @@ import { EmojiType } from "rn-emoji-keyboard";
 import * as schema from "@/db/schema";
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { eq } from "drizzle-orm";
+import { colors } from "@/constants/theme";
 
 const CreateCategory = ({}) => {
   const db = useSQLiteContext();
@@ -29,7 +30,7 @@ const CreateCategory = ({}) => {
   const [newCategory, setNewCategory] = useState<CategoriesProps>({
     category_name: "",
     icon: "💵",
-    color: "#09C2A0",
+    color: categoryType === "expense" ? colors.quarternary : colors.primary,
     type: categoryType ? categoryType : "expense",
   });
 
@@ -97,7 +98,7 @@ const CreateCategory = ({}) => {
       resetState();
       router.replace("/");
     } catch (error) {
-      console.log(error);
+      console.log("createcategory", error);
     }
   };
 

@@ -3,7 +3,7 @@ import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 import CreateModalHeader from "@/components/CreateModalHeader";
 import { AccountSchemaProp, CategoriesProps, TransactionProps } from "@/types";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import {
   View,
   StyleSheet,
@@ -64,6 +64,10 @@ const CreateTransaction = () => {
     transaction_date: "",
   });
 
+  useFocusEffect(() => {
+    getAllAccounts();
+  });
+
   const handleEditTransactionAmount = (num: string) => {
     setTransaction((cur) => ({
       ...cur,
@@ -107,6 +111,10 @@ const CreateTransaction = () => {
   const getAllAccounts = async () => {
     try {
       let result = await drizzleDb.select().from(schema.accounts);
+      if (result.length === 0) {
+        router.navigate("/createaccount?create=true");
+        return;
+      }
       setAccounts([...result]);
       setAccountSelected({ ...result[0] });
     } catch (error) {
@@ -173,6 +181,9 @@ const CreateTransaction = () => {
   };
 
   const handleSubmitNewTransaction = async () => {
+    if (accountSelected.id == undefined) {
+      router.navigate("/createaccount");
+    }
     if (transaction.amount === "0") {
       setAmountMissing(true);
       return;

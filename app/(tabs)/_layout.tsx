@@ -14,12 +14,13 @@ const _layout = () => {
         tabBarActiveTintColor: colors.tertiary,
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: "#0a0a0a",
+          backgroundColor: "#0e0e0e",
           borderWidth: 0,
           borderTopWidth: 0,
           borderTopColor: "transparent",
-          height: 80,
-          paddingTop: 10,
+          height: 70,
+          paddingVertical: 0,
+          paddingBottom: 10,
         },
       }}
     >
