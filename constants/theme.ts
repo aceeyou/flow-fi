@@ -11,7 +11,7 @@ export const colors = {
   textLight: "#e5e5e5",
   textLighter: "#d4d4d4",
   white: "#fff",
-  black: "#000",
+  black: "#232B2B",
   icon_bg: "#d0d6d18f",
   sectionTitle_bg: "#9b9e9b6f",
   neutral50: "#fafafa",

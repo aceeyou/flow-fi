@@ -4,6 +4,7 @@ import Typo from "./Typo";
 import { AccountProps } from "@/types";
 import { colors, radius } from "@/constants/theme";
 import { router } from "expo-router";
+import useIsColorBright from "@/hooks/useIsColorBright";
 
 const AccountItem = ({
   data,
@@ -14,6 +15,8 @@ const AccountItem = ({
   small?: boolean;
   onPress?: () => void;
 }) => {
+  const isBgBright = useIsColorBright(data.color, 0.7);
+
   const handleOnPress = () => {
     if (onPress) onPress();
     else router.navigate(`/createaccount?editMode=1&id=${data.id}`);
@@ -42,7 +45,12 @@ const AccountItem = ({
           marginRight: "auto",
         }}
       >
-        <Typo fontWeight={"500"}>{data.account_name}</Typo>
+        <Typo
+          fontWeight={"500"}
+          color={isBgBright ? colors.black : colors.text}
+        >
+          {data.account_name}
+        </Typo>
         {small && (
           <Typo size={14} fontWeight="300">
             ₱ {data.balance}
@@ -51,7 +59,12 @@ const AccountItem = ({
       </View>
       {!small && (
         <View>
-          <Typo fontWeight={"500"}>₱ {data.balance}</Typo>
+          <Typo
+            fontWeight={"500"}
+            color={isBgBright ? colors.black : colors.text}
+          >
+            ₱ {data.balance}
+          </Typo>
         </View>
       )}
     </Pressable>

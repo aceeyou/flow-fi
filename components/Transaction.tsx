@@ -85,11 +85,36 @@ const Transaction = ({ data }: { data: TransactionProps }) => {
             {transactionData?.icon}
           </Typo>
         </View>
-        <View style={{ flex: 1 }}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
+            style={{
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
           >
             <Typo>{transactionData?.description}</Typo>
+            {transactionData.category_name === transactionData.description ? (
+              ""
+            ) : (
+              <Typo size={14} color={colors.neutral400}>
+                {transactionData.category_name}
+              </Typo>
+            )}
+          </View>
+          <View
+            style={{
+              flexDirection: "column",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+            }}
+          >
             <Typo
               size={20}
               fontWeight={"700"}
@@ -101,13 +126,6 @@ const Transaction = ({ data }: { data: TransactionProps }) => {
             >
               {transactionData?.type === "expense" ? "-" : "+"}₱
               {transactionData?.amount}
-            </Typo>
-          </View>
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <Typo size={14} color={colors.neutral400}>
-              {transactionData.category_name}
             </Typo>
             <Typo size={14} color={colors.neutral400}>
               {transactionData?.account_name}

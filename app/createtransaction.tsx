@@ -23,7 +23,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { FlashList } from "@shopify/flash-list";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
-import ToastManager, { Toast } from "toastify-react-native";
+import Toast from "react-native-toast-message";
 
 const CreateTransaction = () => {
   const db = useSQLiteContext();
@@ -31,6 +31,8 @@ const CreateTransaction = () => {
   const { category_id } = useLocalSearchParams<{ category_id: string }>();
   const inputRef = useRef<TextInput>(null);
   const [amountMissing, setAmountMissing] = useState<boolean>(false);
+  const [isBalanceInsuficient, setIsBalanceInsuficient] =
+    useState<boolean>(false);
 
   const [repeating, setRepeating] = useState<boolean>(false);
   const [viewRepeatDatePicker, setRepeatDatePicker] = useState<boolean>(false);
@@ -92,6 +94,7 @@ const CreateTransaction = () => {
 
   useEffect(() => {
     setAmountMissing(false);
+    setIsBalanceInsuficient(false);
   }, [transaction.amount]);
 
   const getCategory = async () => {
@@ -188,6 +191,12 @@ const CreateTransaction = () => {
       setAmountMissing(true);
       return;
     }
+
+    if (Number(transaction.amount) > Number(accountSelected.balance)) {
+      setIsBalanceInsuficient(true);
+      return;
+    }
+
     try {
       await drizzleDb
         .insert(schema.transactions)
@@ -195,7 +204,9 @@ const CreateTransaction = () => {
           category_id: transaction.category_id,
           account_id: accountSelected.id,
           amount: transaction.amount,
-          description: transaction.description,
+          description: transaction.description
+            ? transaction.description
+            : category.category_name,
           type: category.type,
           transaction_date: transactionDate
             ? transactionDate.toString()
@@ -216,21 +227,14 @@ const CreateTransaction = () => {
         });
     } catch (error) {
       console.log("create transaction error: ", error);
-      Toast.error("Transaction wasn't recorded");
+      // Toast.error("Transaction wasn't recorded");
       router.replace("/");
     }
   };
 
   return (
     <ScreenWrapper modal>
-      <ToastManager
-        position="top"
-        positionValue={50}
-        height={50}
-        duration={1500}
-        showProgressBar={false}
-        showCloseIcon={false}
-      />
+      <Toast visibilityTime={2000} position="top" />
       <CreateModalHeader
         onClose={handleCloseModal}
         onCreate={handleSubmitNewTransaction}
@@ -251,6 +255,15 @@ const CreateTransaction = () => {
               color={"#d19c1f"}
             >
               Set amount to save
+            </Typo>
+          )}
+          {isBalanceInsuficient && (
+            <Typo
+              size={14}
+              style={{ color: "yellow", position: "absolute", bottom: 10 }}
+              color={"#d19c1f"}
+            >
+              Insufficient balance. Please select another account
             </Typo>
           )}
         </TouchableWithoutFeedback>

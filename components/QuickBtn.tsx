@@ -1,28 +1,54 @@
 import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Typo from "./Typo";
-import { LineChart } from "react-native-gifted-charts";
 import { QuickBtnProps } from "@/types";
 import { colors, radius } from "@/constants/theme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-
-// Fetch values from transactions table
-const categorieTrxValues = [
-  { value: 200 },
-  { value: 185 },
-  { value: 305 },
-  { value: 44 },
-  { value: 90 },
-  { value: 400 },
-];
+import { useSQLiteContext } from "expo-sqlite";
+import { drizzle } from "drizzle-orm/expo-sqlite";
+import * as schema from "@/db/schema";
+import { eq } from "drizzle-orm";
+import useIsColorBright from "@/hooks/useIsColorBright";
 
 const QuickBtn = ({
   quickT,
   fullWidth = false,
   transaction = false,
 }: QuickBtnProps) => {
+  const db = useSQLiteContext();
+  const drizzleDb = drizzle(db, { schema });
+  const [amountSpent, setAmountSpent] = useState<number>(0);
+  const isBgBright = useIsColorBright(quickT.color, 0.7);
+
+  useEffect(() => {
+    if (quickT.category_name === "addd_another_category") {
+      return;
+    }
+    getTransactions();
+  }, []);
+
+  // Get all transactions of the category
+  const getTransactions = async () => {
+    const id = quickT.id as number;
+    try {
+      const result = await drizzleDb
+        .select({ amount: schema.transactions.amount })
+        .from(schema.transactions)
+        .where(eq(schema.transactions.category_id, id));
+      setAmountSpent(computeTransactionAmount(result));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const computeTransactionAmount = (amounts: { amount: string }[]) => {
+    let total = 0;
+    amounts.map((amount) => (total = total + Number(amount.amount)));
+    return total;
+  };
+
   return (
     <TouchableOpacity
       style={[
@@ -58,13 +84,21 @@ const QuickBtn = ({
             <Typo size={20}>{quickT.icon}</Typo>
           </View>
           <View>
-            <Typo size={14} fontWeight="600">
+            <Typo
+              size={14}
+              fontWeight="600"
+              color={isBgBright ? colors.black : colors.text}
+            >
               {quickT.category_name}
             </Typo>
-            <Typo size={transaction ? 12 : 10} fontWeight={"400"}>
+            <Typo
+              size={transaction ? 12 : 10}
+              fontWeight={"400"}
+              color={isBgBright ? colors.black : colors.text}
+            >
               {transaction
                 ? quickT.type.charAt(0).toUpperCase() + quickT.type.slice(1)
-                : "P 365.00"}
+                : `₱ ${amountSpent}`}
             </Typo>
           </View>
           <View style={{ position: "absolute", right: 15, top: 20 }}>
@@ -91,16 +125,7 @@ const QuickBtn = ({
                 </View>
               )
             ) : (
-              <LineChart
-                data={categorieTrxValues}
-                curved
-                color={"#ffffff8f"}
-                hideAxesAndRules
-                hideDataPoints
-                spacing={4}
-                width={60}
-                height={20}
-              />
+              <></>
             )}
           </View>
         </>

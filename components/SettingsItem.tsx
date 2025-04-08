@@ -1,4 +1,4 @@
-import { Modal, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Alert, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
 import { colors, radius } from "@/constants/theme";
 import Typo from "./Typo";
@@ -29,7 +29,22 @@ const SettingsItem = <
   const [confirmDelete, setConfirmDelete] = useState<boolean>(false);
   const handlePress = () => {
     if (itemTitle === "Delete all data") {
-      setConfirmDelete(true);
+      Alert.alert(
+        "Delete all data?",
+        "This will erase all accounts, categories, and transactions from the moment you used this application. Do you want to continue?",
+        [
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: handleDeleteData,
+          },
+          {
+            text: "Cancel",
+          },
+        ],
+        { cancelable: true }
+      );
+      // setConfirmDelete(true);
       return;
     }
     navigation.navigate(to as string, params);
@@ -37,7 +52,7 @@ const SettingsItem = <
 
   const handleDeleteData = () => {
     dropDB();
-    setConfirmDelete(false);
+    // setConfirmDelete(false);
     return;
   };
 
